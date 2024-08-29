@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="zh-cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Admin</title>
+    <link rel="stylesheet" href="{{ url_for('statics', path='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+</head>
+
+<body id="page-top">
+<div id="wrapper">
+    <nav class="navbar align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0 navbar-dark">
+        <div class="container-fluid d-flex flex-column p-0">
+            <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="">
+                <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
+                <div class="sidebar-brand-text mx-3"><span>Chat2api</span></div>
+            </a>
+            <hr class="sidebar-divider my-0">
+            <ul class="nav nav-tabs" id="accordionSidebar" role="tablist">
+                <li class="nav-item" role="presentation"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab"
+                                                            role="tab"><i
+                        class="fas fa-tachometer-alt"></i><span>账号管理</span></a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link" href="#tab-2" role="tab"
+                                                            data-bs-toggle="tab"><i
+                        class="fas fa-user"></i><span>用户管理</span></a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link" href="#tab-3" role="tab"
+                                                            data-bs-toggle="tab"><i
+                        class="fas fa-table"></i><span>参数设置</span></a></li>
+            </ul>
+            <div class="text-center d-none d-md-inline">
+                <button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button>
+            </div>
+        </div>
+    </nav>
+    <div class="d-flex flex-column" id="content-wrapper">
+        <div id="content">
+            <nav class="navbar navbar-expand bg-white shadow mb-4 topbar static-top navbar-light">
+                <div class="container-fluid d-flex justify-content-between">
+                    <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <!-- 这里用于占位保持按钮和label在同一行，右侧对齐 -->
+                    <div></div>
+                    <label style="font-size: larger; color: blue;">当前可用token: <label style="color: goldenrod">{{ tokens_count }}</label>，标红为不可用refresh_token</label>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                <div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" role="tabpanel" id="tab-1">
+                            <div style="background: var(--bs-light-border-subtle);padding: 5px;">
+                                <div class="row">
+                                    <div class="col" style="text-align: center;margin-top: 15px;">
+                                        <button id="CAbutton" class="btn btn-primary" type="button"
+                                                data-bs-toggle="modal" data-bs-target="#CAModal">导入新账号
+                                        </button>
+                                    </div>
+                                    <div class="col text-center" style="margin-top: 15px;">
+                                        <!-- 全部删除按钮 -->
+                                        <button class="btn btn-primary" type="button"
+                                                style="background: var(--bs-form-invalid-color);" data-bs-toggle="modal"
+                                                data-bs-target="#confirmDeleteAllAccountsModal">
+                                            全部删除
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 15px;">
+                                    <div class="col">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th style="text-align: center;">账号</th>
+                                                    <th style="text-align: center;">密码</th>
+                                                    <th style="text-align: center;">（access/refresh）token</th>
+                                                    <th style="text-align: center;">操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for account in accounts %}
+                                                    {% if account[0] == 'Account' %}
+
+                                                    {% else %}
+                                                    {% set is_error = account[2] in error_tokens %}
+                                                        <tr>
+                                                            <td class="text-center"
+                                                                style="text-align: center;">{{ account[0] }}</td>
+                                                            <td style="text-align: center;">{{ account[1] }}</td>
+                                                            <td class="fw-light"
+                                                                style="text-align: center;{% if is_error %} background-color: #ffcccc; {% endif %}">{{ account[2] }}</td>
+                                                            <td style="text-align: center;">
+                                                                <!-- 修改按钮，触发 Modal -->
+                                                                <button type="button" class="btn btn-primary"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#editAccountModal"
+                                                                        data-account="{{ account[0] }}"
+                                                                        data-password="{{ account[1] }}"
+                                                                        data-token="{{ account[2] }}"
+                                                                        data-id="{{ loop.index0 }}">
+                                                                    修改
+                                                                </button>
+                                                                <!-- 删除按钮 -->
+                                                                <form action="/{{ api_prefix }}/admin/delete-account/{{ loop.index0 }}"
+                                                                      method="post" style="display:inline;">
+                                                                    <button class="btn btn-danger" type="submit"
+                                                                            style="margin-left: 4px;">删除
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" role="tabpanel" id="tab-2">
+                            <div style="background: var(--bs-light-border-subtle);padding: 5px;">
+                                <div class="row">
+                                    <div class="col" style="text-align: center;margin-top: 15px;">
+                                        <button class="btn btn-primary" type="button" data-bs-toggle="modal"
+                                                data-bs-target="#CUModal">创建新用户
+                                        </button>
+                                    </div>
+                                    <div class="col text-center" style="margin-top: 15px;">
+                                        <!-- 全部删除按钮 -->
+                                        <button class="btn btn-primary" type="button"
+                                                style="background: var(--bs-form-invalid-color);" data-bs-toggle="modal"
+                                                data-bs-target="#confirmDeleteAllUsersModal">
+                                            全部删除
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top: 15px;">
+                                    <div class="col">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th style="text-align: center;">用户</th>
+                                                    <th style="text-align: center;">key</th>
+                                                    <th style="text-align: center;">备注</th>
+                                                    <th style="text-align: center;">操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for user in users %}
+                                                    {% if user[0] == 'User' %}
+                                                    {% else %}
+                                                        <tr>
+                                                            <td class="text-center"
+                                                                style="text-align: center;">{{ user[0] }}</td>
+                                                            <td style="text-align: center;">{{ user[1] }}</td>
+                                                            <td class="fw-light"
+                                                                style="text-align: center;">{{ user[2] }}</td>
+                                                            <td style="text-align: center;">
+                                                                <!-- 修改按钮，触发 Modal -->
+                                                                <button type="button" class="btn btn-primary"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#editUserModal"
+                                                                        data-user="{{ user[0] }}"
+                                                                        data-key="{{ user[1] }}"
+                                                                        data-note="{{ user[2] }}"
+                                                                        data-id="{{ loop.index0 }}">
+                                                                    修改
+                                                                </button>
+                                                                <!-- 删除按钮 -->
+                                                                <form action="/{{ api_prefix }}/admin/delete-user/{{ loop.index0 }}"
+                                                                      method="post" style="display:inline;">
+                                                                    <button class="btn btn-danger" type="submit"
+                                                                            style="margin-left: 4px;">删除
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" role="tabpanel" id="tab-3">
+                            <div style="padding: 5px;">
+                                <form id="configForm" method="POST" action="/{{ api_prefix }}/admin/update-config">
+                                    <div class="row" style="margin: 0 0 15px 0">
+                                        <div class="col" style="text-align: center; margin-top: 15px;">
+                                            <button id="ECbutton" class="btn btn-primary" type="button">修改参数
+                                            </button>
+                                        </div>
+                                        <div class="col text-center" style="margin-top: 15px;">
+                                            <button id="saveButton" class="btn btn-primary" type="button"
+                                                    data-bs-toggle="modal" data-bs-target="#confirmConfigModal">保存
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin: 15px 0 0 0">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="ChatGPT 网关地址，设置后会改变请求的网站，多个网关用逗号分隔">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">ChatGPT_Base_URL</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="chatgpt_base_url" class="form-control"
+                                                                   type="text" name="chatgpt_base_url"
+                                                                   value="{{ configs.chatgpt_base_url }}" disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="全局代理 URL，出 403 时启用，多个代理用逗号分隔">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">Proxy_URL</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="proxy_url" class="form-control" type="text"
+                                                                   name="proxy_url" value="{{ configs.proxy_url }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="出错重试次数，使用 AUTHORIZATION 会自动轮询下一个账号">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">Retry_Times</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="retry_times" class="form-control" type="text"
+                                                                   name="retry_times" value="{{ configs.retry_times }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="开启后不尝试突破官方次数限制，尽可能防止封号">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">Enabled_Limit</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="enable_limit" class="form-control" type="text"
+                                                                   name="enable_limit"
+                                                                   value="{{ configs.enable_limit }}" disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="是否定时刷新 AccessToken ，开启后每次启动程序将会全部非强制刷新一次，每4天晚上3点全部强制刷新一次。">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">Scheduled_Refresh</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="scheduled_refresh" class="form-control"
+                                                                   type="text" name="scheduled_refresh"
+                                                                   value="{{ configs.scheduled_refresh }}" disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="私人网关需要加auth_key请求头才设置该项">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">Auth_Key</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="auth_key" class="form-control" type="text"
+                                                                   name="auth_key" value="{{ configs.auth_key }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="设置随机使用的 UserAgent 列表（可降低风控），不设置则使用默认的 Chrome 浏览器对应UA">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">User_Agents</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="user_agents" class="form-control" type="text"
+                                                                   name="user_agents" value="{{ configs.user_agents }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="text-center" data-bs-toggle="tooltip"
+                                                             data-bss-tooltip="" style="margin-top: 5px;"
+                                                             title="是否不保存聊天记录并返回 conversation_id">
+                                                            <label class="col-form-label text-break"
+                                                                   style="font-size: 15px;">History_Disabled</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center"
+                                                             style="margin-top: 5px; margin-bottom: 5px;">
+                                                            <input id="history_disabled" class="form-control"
+                                                                   type="text" name="history_disabled"
+                                                                   value="{{ configs.history_disabled }}" disabled>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </form>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- CAModal -->
+        <div class="modal fade" id="CAModal" tabindex="-1" aria-labelledby="CAModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="CAModalLabel">上传账号</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="accountForm" method="post" action="/{{ api_prefix }}/admin/upload-account">
+                            <textarea class="form-control mb-3" name="text"
+                                      placeholder="一行一个账号，密码，Token，Token可以是 AccessToken 或 RefreshToken"
+                                      rows="10"></textarea>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="submit" form="accountForm" class="btn btn-primary">上传</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CUModal -->
+        <div class="modal fade" id="CUModal" tabindex="-1" aria-labelledby="CUModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="CUModalLabel">创建用户</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="userForm" method="post" action="/{{ api_prefix }}/admin/upload-user">
+                                <textarea class="form-control mb-3" name="text"
+                                          placeholder="一行一个用户,key,备注，批量上传请换行"
+                                          rows="10"></textarea>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="submit" form="userForm" class="btn btn-primary">上传</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EAModal -->
+        <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editAccountModalLabel">修改账号</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editAccountForm" method="post">
+                            <input type="hidden" name="account_id" id="editAccountId">
+                            <div class="mb-3">
+                                <label for="editAccount" class="form-label">账号</label>
+                                <input type="text" class="form-control" name="account" id="editAccount" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPassword" class="form-label">密码</label>
+                                <input type="text" class="form-control" name="password" id="editPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editToken" class="form-label">Token</label>
+                                <input type="text" class="form-control" name="token" id="editToken" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="submit" form="editAccountForm" class="btn btn-primary">保存修改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // 监听 Modal 打开事件，将数据填充到表单
+            var editAccountModal = document.getElementById('editAccountModal');
+            editAccountModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var account = button.getAttribute('data-account');
+                var password = button.getAttribute('data-password');
+                var token = button.getAttribute('data-token');
+                var accountId = button.getAttribute('data-id');
+
+                var modalTitle = editAccountModal.querySelector('.modal-title');
+                var accountInput = editAccountModal.querySelector('#editAccount');
+                var passwordInput = editAccountModal.querySelector('#editPassword');
+                var tokenInput = editAccountModal.querySelector('#editToken');
+                var accountIdInput = editAccountModal.querySelector('#editAccountId');
+
+                modalTitle.textContent = '修改账号: ' + account;
+                accountInput.value = account;
+                passwordInput.value = password;
+                tokenInput.value = token;
+                accountIdInput.value = accountId;
+
+                // 设置表单的提交 URL
+                document.getElementById('editAccountForm').action = '/{{ api_prefix }}/admin/edit-account/' + accountId;
+            });
+        </script>
+
+        <!-- EUModal -->
+        <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUserModalLabel">修改用户</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUserForm" method="post">
+                            <input type="hidden" name="user_id" id="editUserId">
+                            <div class="mb-3">
+                                <label for="editUser" class="form-label">用户</label>
+                                <input type="text" class="form-control" name="user" id="editUser" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editKey" class="form-label">密钥</label>
+                                <input type="text" class="form-control" name="key" id="editKey" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editNote" class="form-label">备注</label>
+                                <input type="text" class="form-control" name="note" id="editNote" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="submit" form="editUserForm" class="btn btn-primary">保存修改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // 监听 Modal 打开事件，将数据填充到表单
+            var editUserModal = document.getElementById('editUserModal');
+            editUserModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var user = button.getAttribute('data-user');
+                var key = button.getAttribute('data-key');
+                var note = button.getAttribute('data-note');
+                var userId = button.getAttribute('data-id');
+
+                var modalTitle = editUserModal.querySelector('.modal-title');
+                var userInput = editUserModal.querySelector('#editUser');
+                var keyInput = editUserModal.querySelector('#editKey');
+                var noteInput = editUserModal.querySelector('#editNote');
+                var userIdInput = editUserModal.querySelector('#editUserId');
+
+                modalTitle.textContent = '修改用户: ' + user;
+                userInput.value = user;
+                keyInput.value = key;
+                noteInput.value = note;
+                userIdInput.value = userId;
+
+                // 设置表单的提交 URL
+                document.getElementById('editUserForm').action = '/{{ api_prefix }}/admin/edit-user/' + userId;
+            });
+        </script>
+
+        <!-- DAModal -->
+        <div class="modal fade" id="confirmDeleteAllAccountsModal" tabindex="-1"
+             aria-labelledby="confirmDeleteAllAccountsModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteAllAccountsModalLabel">确认删除</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        确定要删除所有账号吗？此操作无法撤销。
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            取消
+                        </button>
+                        <!-- 全部删除提交按钮 -->
+                        <form id="deleteAllForm" method="post"
+                              action="/{{ api_prefix }}/admin/delete-all-accounts">
+                            <button type="submit" class="btn btn-danger">确认删除</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DUModal -->
+        <div class="modal fade" id="confirmDeleteAllUsersModal" tabindex="-1"
+             aria-labelledby="confirmDeleteAllUsersModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteAllUsersModalLabel">确认删除</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        确定要删除所有用户吗？此操作无法撤销。
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            取消
+                        </button>
+                        <!-- 全部删除提交按钮 -->
+                        <form id="deleteAllForm" method="post"
+                              action="/{{ api_prefix }}/admin/delete-all-users">
+                            <button type="submit" class="btn btn-danger">确认删除</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 保存参数修改模态框部分 -->
+        <div class="modal fade" id="confirmConfigModal" tabindex="-1" aria-labelledby="confirmModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmConfigModalLabel">确认保存</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        你确定要保存这些修改吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="confirmConfigSave">确认保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="bg-white sticky-footer">
+            <div class="container my-auto">
+                <div class="text-center my-auto copyright"><span>chat2api@Admin</span></div>
+            </div>
+        </footer>
+    </div>
+    <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('statics', path='js/bs-init.js') }}"></script>
+<script src="{{ url_for('statics', path='js/theme.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var hash = window.location.hash;
+        var tabTriggerEl = document.querySelector('a[href="' + hash + '"]');
+        if (tabTriggerEl) {
+            var tab = new bootstrap.Tab(tabTriggerEl);
+            tab.show();
+        }
+    });
+
+</script>
+<script>
+    document.getElementById('ECbutton').addEventListener('click', function () {
+        let inputs = document.querySelectorAll('input.form-control');
+        inputs.forEach(input => {
+            input.removeAttribute('disabled');  // 使输入框可编辑
+        });
+    });
+</script>
+<script>
+    // 在确认按钮被点击时提交表单
+    document.getElementById('confirmConfigSave').addEventListener('click', function () {
+        document.getElementById('configForm').submit();
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  chat2api:
+    image: lanqian528/chat2api:latest
+    container_name: chat2api
+    restart: unless-stopped
+    ports:
+      - '5005:5005'
+    volumes:
+      - ./data:/app/data # 挂载一些需要保存的数据
+    environment:
+      - TZ=Asia/Shanghai # 设置时区
+      - ARK0SE_TOKEN_URL=http://ark0se:5006/token # 已内置，不要改动
+
+  ark0se:
+    image: lanqian528/funcaptcha_solver:latest
+    container_name: funcaptcha_solver
+    restart: unless-stopped
+    ports:
+      - '5006:5006'
+    environment:
+      - TZ=Asia/Shanghai # 设置时区
