@@ -4,12 +4,12 @@ from fastapi import HTTPException
 
 from chatgpt.refreshToken import rt2ac
 from utils.Logger import logger
-from utils.config import authorization_list
+from utils import config
 import chatgpt.globals as globals
 
 
 def get_req_token(req_token):
-    if req_token in authorization_list:
+    if req_token in config.authorization_list:
         if len(globals.token_list) - len(globals.error_token_list) > 0:
             globals.count += 1
             globals.count %= len(globals.token_list)
@@ -25,7 +25,7 @@ def get_req_token(req_token):
 
 async def verify_token(req_token):
     if not req_token:
-        if authorization_list:
+        if config.authorization_list:
             logger.error("Unauthorized with empty token.")
             raise HTTPException(status_code=401)
         else:
