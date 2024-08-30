@@ -2,8 +2,6 @@
 
 🤖 一个简单的 ChatGPT TO API 代理
 
-🌟 无需账号即可使用免费、无限的 `GPT-3.5`
-
 💥 支持 AccessToken 使用账号，支持 `GPT-4`、`GPT-4o/mini`、 `GPTs`
 
 🔍 回复格式与真实 API 完全一致，适配几乎所有客户端
@@ -11,18 +9,6 @@
 ## 赞助商
 
 感谢 Capsolver 对本项目的赞助，对于市面上任何人机验证码，你可以使用 [https://capsolver.com](https://capsolver.com/?utm_source=github&utm_medium=github_banner&utm_campaign=chat2api) 来解决
-
-## 交流群
-
-[https://t.me/chat2api](https://t.me/chat2api)
-
-要提问请先阅读完仓库文档，尤其是常见问题部分。
-
-提问时请提供：
-
-1. 启动日志截图（敏感信息打码，包括环境变量和版本号）
-2. 报错的日志信息（敏感信息打码）
-3. 接口返回的状态码和响应体
 
 ## 功能
 
@@ -37,7 +23,6 @@
 > - [x] 支持 GPTs（传入模型名：gpt-4-gizmo-g-*）
 > - [x] 支持 Team Plus 账号（需传入 team account id）
 > - [x] 上传图片、文件（格式为 API 对应格式，支持 URL 和 base64）
-> - [x] WebUI（[http://127.0.0.1:5005](http://127.0.0.1:5005)，不支持登录使用, 网关副产品，因此不做维护）
 > - [x] 可作为网关使用，可多机分布部署
 > - [x] 多账号轮询，同时支持 AccessToken 和 RefreshToken
 > - [x] 请求失败重试，自动轮询下一个 Token
@@ -52,11 +37,11 @@
 
 1. 配置环境变量 `AUTHORIZATION` 作为 `授权码` ，然后运行程序。
 
-2. 访问 `/tokens` 或者 `/{api_prefix}/tokens` 可以查看现有 Tokens 数量，也可以上传新的 Tokens ，或者清空 Tokens。
+2. 访问 `/admin` 或者 `/{api_prefix}/admin` 可以查看现有 Tokens 数量，也可以上传新的 Tokens ，或者清空 Tokens。可以配置用户的Key
 
 3. 请求时传入 `AUTHORIZATION` 中配置的 `授权码` 即可使用轮询的Tokens进行对话， `AUTHORIZATION` 可以配置多个值，用英文逗号分隔。
 
-![tokens.png](docs/tokens.png)
+
 
 ## 环境变量
 
@@ -83,14 +68,10 @@
 |      | SCHEDULED_REFRESH | `false`                                                     | `false`               | 是否定时刷新 AccessToken ，开启后每次启动程序将会全部非强制刷新一次，每4天晚上3点全部强制刷新一次。    |
 ## 部署
 
-### Zeabur 部署
-
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/6HEGIZ?referralCode=LanQian528)
-
 ### 直接部署
 
 ```bash
-git clone https://github.com/LanQian528/chat2api
+git clone https://github.com/shunqiziran54/chat2api
 cd chat2api
 pip install -r requirements.txt
 python app.py
@@ -104,7 +85,7 @@ python app.py
 docker run -d \
   --name chat2api \
   -p 5005:5005 \
-  lanqian528/chat2api:latest
+  shunqiziran154/chat2api:latest
 ```
 
 ### (推荐，可用 PLUS 账号) Docker Compose 部署
@@ -130,10 +111,10 @@ docker-compose up -d
 
 ## 使用
 
-1. 在网页使用，直接访问以下地址，仅支持使用免登 GPT-3.5：
+1. 在网页使用，直接访问以下地址进入管理界面：
 
 ```
-http://127.0.0.1:5005
+http://127.0.0.1:5005/{api_prefix}/admin
 ```
 
 2. 使用 API ，支持传入 AccessToken 或 RefreshToken，可用 GPT-4, GPT-4o, GPTs：
