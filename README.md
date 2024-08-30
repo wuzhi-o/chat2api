@@ -1,15 +1,14 @@
 # CHAT2API
 
-🤖 一个简单的 ChatGPT TO API 代理
+🤖 一个简单的 ChatGPT TO API 代理管理界面
 
 💥 支持 AccessToken 使用账号，支持 `GPT-4`、`GPT-4o/mini`、 `GPTs`
 
 🔍 回复格式与真实 API 完全一致，适配几乎所有客户端
 
-## 赞助商
+![admin](docs/admin_token.png)
 
-感谢 Capsolver 对本项目的赞助，对于市面上任何人机验证码，你可以使用 [https://capsolver.com](https://capsolver.com/?utm_source=github&utm_medium=github_banner&utm_campaign=chat2api) 来解决
-
+![admin](docs/admin_user.png)
 ## 功能
 
 ### 最新版 v1.4.5
