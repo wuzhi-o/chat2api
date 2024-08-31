@@ -93,7 +93,7 @@
                                                                 style="text-align: center;">{{ account[0] }}</td>
                                                             <td style="text-align: center;">{{ account[1] }}</td>
                                                             <td class="fw-light"
-                                                                style="text-align: center;{% if is_error %} background-color: #ffcccc; {% endif %}">{{ account[2] }}</td>
+                                                                style="text-align: center;{% if is_error %} background-color: #ffcccc; {% endif %}">{{ account[2]|slice(0, 20) }}</td>
                                                             <td style="text-align: center;">
                                                                 <!-- 修改按钮，触发 Modal -->
                                                                 <button type="button" class="btn btn-primary"
@@ -436,7 +436,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editToken" class="form-label">Token</label>
-                                <input type="text" class="form-control" name="token" id="editToken" required>
+                                <textarea class="form-control" name="token" id="editToken" rows="3" required></textarea>
                             </div>
                         </form>
                     </div>
