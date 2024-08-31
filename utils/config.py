@@ -52,7 +52,7 @@ def update_user_list():
     logger.info(str(authorization_list))
 
 
-api_prefix = os.getenv('API_PREFIX', "None")
+api_prefix = os.getenv('API_PREFIX', None)
 
 authorization = get_all_keys_from_csv('data/users.csv').replace(' ', '')
 chatgpt_base_url = os.getenv('CHATGPT_BASE_URL', 'https://chatgpt.com').replace(' ', '')
